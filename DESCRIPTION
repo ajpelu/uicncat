@@ -16,3 +16,7 @@ Encoding: UTF-8
 LazyData: true
 URL: https://github.com/ajpelu/uicncat
 BugReports: https://github.com/ajpelu/uicncat/issues
+Imports: 
+    dplyr
+RoxygenNote: 7.3.2
+Roxygen: list(markdown = TRUE)

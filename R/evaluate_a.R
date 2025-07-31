@@ -53,6 +53,7 @@ evaluate_a <- function(df) {
   )
 
   missing_vars <- setdiff(required_vars, names(df))
+
   assertthat::assert_that(
     length(missing_vars) == 0,
     msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
@@ -89,7 +90,7 @@ evaluate_a <- function(df) {
   output_names <- c("A1", "A2", "A3", "A4")
 
   for (i in seq_along(types)) {
-    df[[output_names[i]]] <- .classify(df, var_type = types[i],
+    df[[output_names[i]]] <- .classify_a(df, var_type = types[i],
                                        thresholds_list[[i]],
                                        var_th = "a_pop_red")
   }

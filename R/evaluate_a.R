@@ -1,48 +1,39 @@
-#' Classify species risk according to IUCN Criterion A
+#'#' Evaluate IUCN Criterion A (Population Reduction)
 #'
-#' This function validates input data and classifies species based on population reduction
-#' using IUCN Criterion **A1 to A4** thresholds. It also generates categorical flags (**Aa–Ae**)
-#' based on presence indicators like `based_a`, `based_b`, etc.
+#' This function evaluates species under IUCN Criterion A by classifying population
+#' reduction percentages (`a_pop_red`) across types **A1–A4**, and identifying
+#' which supporting evidence types **Aa–Ae** apply.
 #'
 #' @param df A data frame with the following required columns:
+#' - `a_pop_red`: Numeric, population reduction percentage (range: 0–100)
+#' - `type_A1` to `type_A4`: Binary flags indicating which A-types apply (1 = applies, 0 = not)
+#' - `based_a` to `based_e`: Binary flags for types of evidence used
+#' - `species`: Species identifier
 #'
-#' - `a_pop_red`: Numeric, percent population reduction (0–100)
-#' - `type_A1` to `type_A4`: Integer flags (1/0) indicating which A sub-criteria apply
-#' - `based_a` to `based_e`: Integer flags (1/0) for additional categorical marks
-#' - `species`: Character, species identifier
-#'
-#' @return A data frame with the original `species` column plus:
-#'
-#' - `A1` to `A4`: IUCN classification per subcriterion (`"CR"`, `"EN"`, `"VU"`, `"NT"`)
-#' - `Aa` to `Ae`: Single-letter codes (`"a"` to `"e"`) when corresponding `based_*` is 1
+#' @return A tibble with the following columns:
+#' - `species`: Species identifier
+#' - `A1` to `A4`: Classification per A-type (`"CR"`, `"EN"`, `"VU"`, `"NT"`, or `NA`)
+#' - `Aa` to `Ae`: Evidence labels present (`"a"` to `"e"`), or `NA` if not used
 #'
 #' @details
 #' Classification thresholds:
+#' - **A1**: CR ≥ 90, EN ≥ 70, VU ≥ 50
+#' - **A2–A4**: CR ≥ 80, EN ≥ 50, VU ≥ 30
 #'
-#' - **A1**: CR ≥ 90, EN ≥ 70, VU ≥ 50, else NT
-#' - **A2–A4**: CR ≥ 80, EN ≥ 50, VU ≥ 30, else NT
-#'
-#' The function uses internal validation and issues CLI messages to inform the user
-#' about data integrity and classification steps.
+#' Supporting evidence is derived from `based_a` to `based_e`, mapping directly to `Aa` to `Ae`.
 #'
 #' @examples
-#' df <- data.frame(
-#'   species = c("sp1", "sp2"),
-#'   a_pop_red = c(85, 40),
-#'   type_A1 = c(1, 1),
-#'   type_A2 = c(0, 0),
-#'   type_A3 = c(0, 0),
-#'   type_A4 = c(0, 0),
-#'   based_a = c(1, 0),
-#'   based_b = c(0, 1),
-#'   based_c = 0, based_d = 0, based_e = 0
+#' df <- tibble::tibble(
+#'   species = "Panthera onca",
+#'   a_pop_red = 85,
+#'   type_A1 = 0, type_A2 = 1, type_A3 = 0, type_A4 = 0,
+#'   based_a = 1, based_b = 0, based_c = 0, based_d = 0, based_e = 1
 #' )
 #' evaluate_a(df)
 #'
-#' @importFrom cli cli_alert_info cli_alert_success
-#' @importFrom assertthat assert_that
 #' @export
 #'
+
 evaluate_a <- function(df) {
 
   cli::cli_alert_info("Checking presence of required variables...")

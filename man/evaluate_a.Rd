@@ -2,52 +2,47 @@
 % Please edit documentation in R/evaluate_a.R
 \name{evaluate_a}
 \alias{evaluate_a}
-\title{Classify species risk according to IUCN Criterion A}
+\title{#' Evaluate IUCN Criterion A (Population Reduction)}
 \usage{
 evaluate_a(df)
 }
 \arguments{
 \item{df}{A data frame with the following required columns:
 \itemize{
-\item \code{a_pop_red}: Numeric, percent population reduction (0–100)
-\item \code{type_A1} to \code{type_A4}: Integer flags (1/0) indicating which A sub-criteria apply
-\item \code{based_a} to \code{based_e}: Integer flags (1/0) for additional categorical marks
-\item \code{species}: Character, species identifier
+\item \code{a_pop_red}: Numeric, population reduction percentage (range: 0–100)
+\item \code{type_A1} to \code{type_A4}: Binary flags indicating which A-types apply (1 = applies, 0 = not)
+\item \code{based_a} to \code{based_e}: Binary flags for types of evidence used
+\item \code{species}: Species identifier
 }}
 }
 \value{
-A data frame with the original \code{species} column plus:
+A tibble with the following columns:
 \itemize{
-\item \code{A1} to \code{A4}: IUCN classification per subcriterion (\code{"CR"}, \code{"EN"}, \code{"VU"}, \code{"NT"})
-\item \code{Aa} to \code{Ae}: Single-letter codes (\code{"a"} to \code{"e"}) when corresponding \verb{based_*} is 1
+\item \code{species}: Species identifier
+\item \code{A1} to \code{A4}: Classification per A-type (\code{"CR"}, \code{"EN"}, \code{"VU"}, \code{"NT"}, or \code{NA})
+\item \code{Aa} to \code{Ae}: Evidence labels present (\code{"a"} to \code{"e"}), or \code{NA} if not used
 }
 }
 \description{
-This function validates input data and classifies species based on population reduction
-using IUCN Criterion \strong{A1 to A4} thresholds. It also generates categorical flags (\strong{Aa–Ae})
-based on presence indicators like \code{based_a}, \code{based_b}, etc.
+This function evaluates species under IUCN Criterion A by classifying population
+reduction percentages (\code{a_pop_red}) across types \strong{A1–A4}, and identifying
+which supporting evidence types \strong{Aa–Ae} apply.
 }
 \details{
 Classification thresholds:
 \itemize{
-\item \strong{A1}: CR ≥ 90, EN ≥ 70, VU ≥ 50, else NT
-\item \strong{A2–A4}: CR ≥ 80, EN ≥ 50, VU ≥ 30, else NT
+\item \strong{A1}: CR ≥ 90, EN ≥ 70, VU ≥ 50
+\item \strong{A2–A4}: CR ≥ 80, EN ≥ 50, VU ≥ 30
 }
 
-The function uses internal validation and issues CLI messages to inform the user
-about data integrity and classification steps.
+Supporting evidence is derived from \code{based_a} to \code{based_e}, mapping directly to \code{Aa} to \code{Ae}.
 }
 \examples{
-df <- data.frame(
-  species = c("sp1", "sp2"),
-  a_pop_red = c(85, 40),
-  type_A1 = c(1, 1),
-  type_A2 = c(0, 0),
-  type_A3 = c(0, 0),
-  type_A4 = c(0, 0),
-  based_a = c(1, 0),
-  based_b = c(0, 1),
-  based_c = 0, based_d = 0, based_e = 0
+df <- tibble::tibble(
+  species = "Panthera onca",
+  a_pop_red = 85,
+  type_A1 = 0, type_A2 = 1, type_A3 = 0, type_A4 = 0,
+  based_a = 1, based_b = 0, based_c = 0, based_d = 0, based_e = 1
 )
 evaluate_a(df)
 

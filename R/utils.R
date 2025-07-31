@@ -7,7 +7,7 @@
 #' @return A character vector with the classification results.
 
 
-.classify <- function(df, var_type, thresholds, var_th) {
+.classify_a <- function(df, var_type, thresholds, var_th) {
   v <- df[[var_th]]
   th <- thresholds
 
@@ -16,6 +16,19 @@
     df[[var_type]] == 1 & v >= th[2] & v < th[1] ~ "EN",
     df[[var_type]] == 1 & v >= th[3] & v < th[2] ~ "VU",
     df[[var_type]] == 1 & v < th[3] ~ "NT",
+    TRUE ~ NA_character_
+  )
+}
+
+
+.classify_b <- function(df, thresholds, var_th) {
+  v <- df[[var_th]]
+  th <- thresholds
+
+  dplyr::case_when(
+    v < th[1] ~ "CR",
+    v >= th[1] & v < th[2] ~ "EN",
+    v >= th[2] & v < th[3] ~ "VU",
     TRUE ~ NA_character_
   )
 }

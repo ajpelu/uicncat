@@ -38,12 +38,18 @@ evaluate_a <- function(df) {
 
   cli::cli_alert_info("Checking presence of required variables...")
 
-  required_vars <- c(
-    "a_pop_red", "type_A1", "type_A2", "type_A3", "type_A4",
+  a_vars_upper <- c(
+    "A_pop_red", "type_A1", "type_A2", "type_A3", "type_A4",
     "based_a", "based_b", "based_c", "based_d", "based_e", "species"
   )
 
-  missing_vars <- setdiff(required_vars, names(df))
+  a_vars <- tolower(a_vars_upper)
+
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
+
+  missing_vars <- setdiff(a_vars, lower_names)
 
   assertthat::assert_that(
     length(missing_vars) == 0,
@@ -71,7 +77,7 @@ evaluate_a <- function(df) {
 
   cli::cli_alert_info("Classifying 'a_pop_red' for types A1–A4...")
 
-  types <- c("type_A1", "type_A2", "type_A3", "type_A4")
+  types <- c("type_a1", "type_a2", "type_a3", "type_a4")
   thresholds_list <- list(
     c(90, 70, 50),
     c(80, 50, 30),
@@ -96,7 +102,7 @@ evaluate_a <- function(df) {
 
   cli::cli_alert_success("Classification complete.")
 
-  return(df[c("species", "A1", "A2", "A3", "A4",
+  return(df[c("A1", "A2", "A3", "A4",
               "Aa", "Ab", "Ac", "Ad", "Ae")])
 }
 

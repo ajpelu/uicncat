@@ -2,17 +2,24 @@
 % Please edit documentation in R/helpers.R
 \name{.evaluate_ba}
 \alias{.evaluate_ba}
-\title{Evaluate criterion B(a): small population size}
+\title{Evaluate Criterion B(a): number of locations}
 \usage{
 .evaluate_ba(df)
 }
 \arguments{
-\item{df}{A data frame that must include the variable "B_AND_a".}
+\item{df}{A data frame containing the variable \code{B_AND_a} (or equivalent).}
 }
 \value{
-A character vector with values: "CR", "EN", "VU", or NA.
+A character vector with values \code{"CR"}, \code{"EN"}, \code{"VU"}, or \code{NA}.
 }
 \description{
-Assigns a conservation category (CR, EN, VU) based on the number of individuals
-in a population.
+Classifies species based on the number of locations (\code{B_AND_a}) using thresholds:
+\itemize{
+\item CR: 1 location
+\item EN: 2–5 locations
+\item VU: 6–10 locations
+}
+}
+\details{
+Column names are case-insensitive.
 }

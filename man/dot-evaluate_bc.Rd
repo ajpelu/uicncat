@@ -2,16 +2,21 @@
 % Please edit documentation in R/helpers.R
 \name{.evaluate_bc}
 \alias{.evaluate_bc}
-\title{Evaluate criterion B(c): extreme fluctuations}
+\title{Evaluate Criterion B(c): extreme fluctuations}
 \usage{
 .evaluate_bc(df)
 }
 \arguments{
-\item{df}{A data frame that must include the variables "B_AND_c_i" to "B_AND_c_iv".}
+\item{df}{A data frame containing variables \code{B_AND_c_i} to \code{B_AND_c_iv} (or lowercased).}
 }
 \value{
-A string of the form "c(i,ii,...)" if any sub-criterion is met, or NA if none apply.
+A character vector with the same number of rows as \code{df}. Each value is:
+\itemize{
+\item \code{"c(i,...)"} if subcriteria are active
+\item \code{NA} if none apply
+}
 }
 \description{
-Checks which sub-criteria under criterion B(c) are triggered (i.e., have value 1), and returns a label indicating which ones.
+Identifies which subcriteria under Criterion B(c) are active (i.e., have value
+1 or are TRUE)), and returns a label indicating the codes, such as \code{"c(ii,iv)"}.
 }

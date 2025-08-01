@@ -2,23 +2,33 @@
 % Please edit documentation in R/helpers.R
 \name{.classify_a}
 \alias{.classify_a}
-\title{Classify species based on thresholds}
+\title{Classify species using type-based thresholds (Criterion A)}
 \usage{
 .classify_a(df, var_type, thresholds, var_th)
 }
 \arguments{
-\item{df}{A data frame containing the species data.}
+\item{df}{A data frame containing species information.}
 
-\item{var_type}{The variable type to classify (e.g., "type_A1", "type_A2").}
+\item{var_type}{A character string with the name of the type column (e.g., \code{"type_A1"}).
+It is the variable type to classify}
 
-\item{thresholds}{A numeric vector containing the thresholds for classification.}
+\item{thresholds}{A numeric vector containing the thresholds for classification.
+By default it must contains 3 values, used to classify into \code{CR}, \code{EN}, or \code{VU}.}
 
-\item{var_th}{The variable to use for classification (e.g., "A_Pop_red").}
+\item{var_th}{A character string with the name of the numeric variable to
+classify (e.g., \code{"a_pop_red"}).}
 }
 \value{
-A character vector with the classification results.
+A character vector with classification results:
+\itemize{
+\item \code{"CR"} (Critically Endangered)
+\item \code{"EN"} (Endangered)
+\item \code{"VU"} (Vulnerable)
+\item \code{"NT"} (Near Threatened)
+}
 }
 \description{
-This function classifies species into categories based on their variable type
-and thresholds.
+Internal function to classify species under Criterion A based on a type indicator
+(e.g., \code{type_A1}) and a numeric variable (e.g., population reduction), using
+predefined thresholds.
 }

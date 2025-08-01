@@ -2,7 +2,7 @@
 % Please edit documentation in R/helpers.R
 \name{.classify_b}
 \alias{.classify_b}
-\title{Classify species based on a single variable and numeric thresholds (Criterion B)}
+\title{Classify species based on a single variable and thresholds (Criterion B)}
 \usage{
 .classify_b(df, thresholds, var_th)
 }
@@ -11,12 +11,12 @@
 
 \item{thresholds}{A numeric vector of length 3, defining the thresholds for:
 \itemize{
-\item \code{CR}: values < thresholds \verb{[1]}
-\item \code{EN}: values < thresholds \verb{[2]}
-\item \code{VU}: values < thresholds \verb{[3]}
+\item \code{CR} if value < \code{thresholds[1]}
+\item \code{EN} if value < \code{thresholds[2]}
+\item \code{VU} if value < \code{thresholds[3]}
 }}
 
-\item{var_th}{A character string indicating the name of the column in \code{df} to classify.}
+\item{var_th}{A character string specifying the variable name to classify.}
 }
 \value{
 A character vector with classification results:
@@ -28,11 +28,10 @@ A character vector with classification results:
 }
 }
 \description{
-Internal function used to assign a Red List category (\code{CR}, \code{EN}, \code{VU}) based on a
-continuous numeric variable and threshold values.
-}
-\details{
-Typically used to classify geographic range measures such as:
+Internal function that assigns a conservation category based on a continuous
+numeric variable and threshold cutoffs (e.g., extent of occurrence -eoo- or
+area of occupancy -aoo-). Typically used to classify geographic range measures
+such as:
 \itemize{
 \item Extent of Occurrence (EoO, \code{B1_eoo})
 \item Area of Occupancy (AoO, \code{B2_aoo})

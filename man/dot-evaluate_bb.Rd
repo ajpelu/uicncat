@@ -7,13 +7,16 @@
 .evaluate_bb(df)
 }
 \arguments{
-\item{df}{A data frame that must include the variables "B_AND_b_i" to "B_AND_b_v".}
+\item{df}{A data frame containing variables \code{B_AND_b_i} to \code{B_AND_b_v} (or lowercased).}
 }
 \value{
-A string of the form "b(i,ii,...)" if any sub-criterion is met, or NA
-if none apply.
+A character vector with the same number of rows as \code{df}. Each value is:
+\itemize{
+\item \code{"b(i,...)"} if subcriteria are active
+\item \code{NA} if none apply
+}
 }
 \description{
-Checks which sub-criteria under criterion B(b) are triggered (i.e., have value
-1 or are TRUE), and returns a label indicating which ones.
+Identifies which subcriteria under Criterion B(b) are active (i.e., have value
+1 or are TRUE)), and returns a label indicating the codes, such as \code{"b(i,ii,iv)"}.
 }

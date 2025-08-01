@@ -1,15 +1,22 @@
-#' Classify species based on thresholds
+#' Classify species using type-based thresholds (Criterion A)
 #'
-#' This function classifies species into categories based on their variable type
-#' and thresholds.
+#' Internal function to classify species under Criterion A based on a type indicator
+#' (e.g., `type_A1`) and a numeric variable (e.g., population reduction), using
+#' predefined thresholds.
 #'
-#' @param df A data frame containing the species data.
-#' @param var_type The variable type to classify (e.g., "type_A1", "type_A2").
+#' @param df A data frame containing species information.
+#' @param var_type A character string with the name of the type column (e.g., `"type_A1"`).
+#' It is the variable type to classify
 #' @param thresholds A numeric vector containing the thresholds for classification.
-#' @param var_th The variable to use for classification (e.g., "A_Pop_red").
+#' By default it must contains 3 values, used to classify into `CR`, `EN`, or `VU`.
+#' @param var_th A character string with the name of the numeric variable to
+#' classify (e.g., `"a_pop_red"`).
 #'
-#' @return A character vector with the classification results.
-
+#' @return A character vector with classification results:
+#' - `"CR"` (Critically Endangered)
+#' - `"EN"` (Endangered)
+#' - `"VU"` (Vulnerable)
+#' - `"NT"` (Near Threatened)
 
 .classify_a <- function(df, var_type, thresholds, var_th) {
   v <- df[[var_th]]
@@ -24,28 +31,28 @@
   )
 }
 
-#' Classify species based on a single variable and numeric thresholds (Criterion B)
+#' Classify species based on a single variable and thresholds (Criterion B)
 #'
-#' Internal function used to assign a Red List category (`CR`, `EN`, `VU`) based on a
-#' continuous numeric variable and threshold values.
-#'
-#' Typically used to classify geographic range measures such as:
+#' Internal function that assigns a conservation category based on a continuous
+#' numeric variable and threshold cutoffs (e.g., extent of occurrence -eoo- or
+#' area of occupancy -aoo-). Typically used to classify geographic range measures
+#' such as:
 #' - Extent of Occurrence (EoO, `B1_eoo`)
 #' - Area of Occupancy (AoO, `B2_aoo`)
 #'
 #' @param df A data frame containing the variable to classify.
 #' @param thresholds A numeric vector of length 3, defining the thresholds for:
-#' - `CR`: values < thresholds `[1]`
-#' - `EN`: values < thresholds `[2]`
-#' - `VU`: values < thresholds `[3]`
-#' @param var_th A character string indicating the name of the column in `df` to classify.
+#' - `CR` if value < `thresholds[1]`
+#' - `EN` if value < `thresholds[2]`
+#' - `VU` if value < `thresholds[3]`
+#' @param var_th A character string specifying the variable name to classify.
 #'
 #' @return A character vector with classification results:
 #' - `"CR"` = Critically Endangered
 #' - `"EN"` = Endangered
 #' - `"VU"` = Vulnerable
 #' - `NA` if no thresholds are met
-#'
+
 .classify_b <- function(df, thresholds, var_th) {
   v <- df[[var_th]]
   th <- thresholds
@@ -58,28 +65,36 @@
   )
 }
 
+#' Evaluate Criterion B(a): number of locations
+#'
+#' Classifies species based on the number of locations (`B_AND_a`) using thresholds:
+#' - CR: 1 location
+#' - EN: 2–5 locations
+#' - VU: 6–10 locations
+#'
+#' Column names are case-insensitive.
+#'
+#' @param df A data frame containing the variable `B_AND_a` (or equivalent).
+#'
+#' @return A character vector with values `"CR"`, `"EN"`, `"VU"`, or `NA`.
 
-
-#' Evaluate criterion B(a): small population size
-#'
-#' Assigns a conservation category (CR, EN, VU) based on the number of individuals
-#' in a population.
-#'
-#' @param df A data frame that must include the variable "B_AND_a".
-#'
-#' @return A character vector with values: "CR", "EN", "VU", or NA.
 .evaluate_ba <- function(df) {
+  # Define the variable to check
+  ba_vars_upper <- "B_AND_a"
+  ba_vars <- "b_and_a"
 
-  ba_vars <- "B_AND_a"
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
   # Check if the required variable is present
   assertthat::assert_that(
-    ba_vars %in% names(df),
-    msg = glue::glue("Variable '{ba_vars}' is not present in the data.")
+    ba_vars %in% lower_names,
+    msg = glue::glue("Variable '{ba_vars_upper}' is not present in the data.")
   )
   # Check if the variable is numeric
   assertthat::assert_that(
     is.numeric(df[[ba_vars]]),
-    msg = glue::glue("{ba_vars} must be numeric.")
+    msg = glue::glue("{ba_vars_upper} must be numeric.")
   )
 
   category <- .classify_b(df, thresholds = c(1, 5, 10), var_th = ba_vars)
@@ -90,75 +105,99 @@
 
 #' Evaluate criterion B(b): continuing decline
 #'
-#' Checks which sub-criteria under criterion B(b) are triggered (i.e., have value
-#' 1 or are TRUE), and returns a label indicating which ones.
+#' Identifies which subcriteria under Criterion B(b) are active (i.e., have value
+#' 1 or are TRUE)), and returns a label indicating the codes, such as `"b(i,ii,iv)"`.
 #'
-#' @param df A data frame that must include the variables "B_AND_b_i" to "B_AND_b_v".
+#' @param df A data frame containing variables `B_AND_b_i` to `B_AND_b_v` (or lowercased).
 #'
-#' @return A string of the form "b(i,ii,...)" if any sub-criterion is met, or NA
-#' if none apply.
-
+#' @return A character vector with the same number of rows as `df`. Each value is:
+#' - `"b(i,...)"` if subcriteria are active
+#' - `NA` if none apply
+#'
 
 .evaluate_bb <- function(df) {
 
-  bb_vars <- c("B_AND_b_i", "B_AND_b_ii", "B_AND_b_iii", "B_AND_b_iv", "B_AND_b_v")
+  bb_vars_upper <- c("B_AND_b_i", "B_AND_b_ii", "B_AND_b_iii", "B_AND_b_iv", "B_AND_b_v")
+  bb_vars <- tolower(bb_vars_upper)
 
-  missing_vars <- setdiff(bb_vars, names(df))
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
+  missing_vars <- setdiff(bb_vars, lower_names)
 
   assertthat::assert_that(
     length(missing_vars) == 0,
     msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
   )
 
-  valores <- df[bb_vars]
+  # Initialize output (to store results for each row)
+  output <- character(nrow(df))
 
-  # Identify columns with value 1 (ignoring NA)
-  activos <- names(valores)[!is.na(valores) & valores == 1]
+  for (i in seq_len(nrow(df))) {
+    # Get the row i with the variable selected
+    row_sel <- df[i, bb_vars, drop = FALSE]
 
-  # Extract criteria
-  if (length(activos) > 0) {
-    criterios <- gsub("B_AND_b_", "", activos)
-    category <- paste0("b(", paste(criterios, collapse = ","), ")")
-  } else {
-    category <- NA_character_
+    # Identify columns with value 1 (ignoring NA)
+    activos <- names(row_sel)[!is.na(row_sel) & row_sel == 1]
+
+    # Extract criteria
+    if (length(activos) > 0) {
+      criterios <- gsub("b_and_b_", "", activos)
+      output[i] <- paste0("b(", paste(criterios, collapse = ","), ")")
+    } else {
+      output[i] <- NA_character_
+    }
   }
 
-  return(category)
-
+  return(output)
 }
 
-#' Evaluate criterion B(c): extreme fluctuations
+#' Evaluate Criterion B(c): extreme fluctuations
 #'
-#' Checks which sub-criteria under criterion B(c) are triggered (i.e., have value 1), and returns a label indicating which ones.
+#' Identifies which subcriteria under Criterion B(c) are active (i.e., have value
+#' 1 or are TRUE)), and returns a label indicating the codes, such as `"c(ii,iv)"`.
 #'
-#' @param df A data frame that must include the variables "B_AND_c_i" to "B_AND_c_iv".
+#' @param df A data frame containing variables `B_AND_c_i` to `B_AND_c_iv` (or lowercased).
 #'
-#' @return A string of the form "c(i,ii,...)" if any sub-criterion is met, or NA if none apply.
+#' @return A character vector with the same number of rows as `df`. Each value is:
+#' - `"c(i,...)"` if subcriteria are active
+#' - `NA` if none apply
 
 .evaluate_bc <- function(df) {
 
-  bc_vars <-  c("B_AND_c_i", "B_AND_c_ii", "B_AND_c_iii", "B_AND_c_iv")
+  bc_vars_upper <-  c("B_AND_c_i", "B_AND_c_ii", "B_AND_c_iii", "B_AND_c_iv")
+  bc_vars <- tolower(bc_vars_upper)
 
-  missing_vars <- setdiff(bc_vars, names(df))
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
+  missing_vars <- setdiff(bc_vars, lower_names)
 
   assertthat::assert_that(
     length(missing_vars) == 0,
     msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
   )
 
-  valores <- df[bc_vars]
 
-  # Identify columns with value 1 (ignoring NA)
-  activos <- names(valores)[!is.na(valores) & valores == 1]
+  # Initialize output (to store results for each row)
+  output <- character(nrow(df))
 
-  # Extract criteria
-  if (length(activos) > 0) {
-    criterios <- gsub("B_AND_c_", "", activos)
-    category <- paste0("c(", paste(criterios, collapse = ","), ")")
-  } else {
-    category <- NA_character_
+  for (i in seq_len(nrow(df))) {
+    # Get the row i with the variable selected
+    row_sel <- df[i, bc_vars, drop = FALSE]
+
+    # Identify columns with value 1 (ignoring NA)
+    activos <- names(row_sel)[!is.na(row_sel) & row_sel == 1]
+
+    # Extract criteria
+    if (length(activos) > 0) {
+      criterios <- gsub("b_and_c_", "", activos)
+      output[i] <- paste0("c(", paste(criterios, collapse = ","), ")")
+    } else {
+      output[i] <- NA_character_
+    }
   }
 
-  return(category)
+  return(output)
 
 }

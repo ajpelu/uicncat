@@ -65,6 +65,36 @@
   )
 }
 
+#### Documentar !!!!!
+.classify_c <- function(df, thresholds, var_th) {
+  v <- df[[var_th]]
+  th <- thresholds
+
+  dplyr::case_when(
+    v < th[1] ~ "CR",
+    v >= th[1] & v < th[2] ~ "EN",
+    v >= th[2] & v < th[3] ~ "VU",
+    TRUE ~ NA_character_
+  )
+}
+
+
+#### Documentar !!!!!
+.classify_c2ai <- function(df, thresholds, var_th) {
+  v <- df[[var_th]]
+  th <- thresholds
+
+  dplyr::case_when(
+    v < th[1] ~ "CR",
+    v >= th[1] & v < th[2] ~ "EN",
+    v >= th[2] & v < th[3] ~ "VU",
+    TRUE ~ NA_character_
+  )
+}
+
+
+
+
 #' Evaluate Criterion B(a): number of locations
 #'
 #' Classifies species based on the number of locations (`B_AND_a`) using thresholds:
@@ -201,3 +231,68 @@
   return(output)
 
 }
+
+#' Evaluate Criterion C: number of mature individuals
+#'#### Documentar !!!!!
+
+
+.evaluate_cmat <- function(df) {
+  # Define the variable to check
+  cmat_vars_upper <- "C_n_mat"
+  cmat_vars <- "c_n_mat"
+
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
+  # Check if the required variable is present
+  assertthat::assert_that(
+    cmat_vars %in% lower_names,
+    msg = glue::glue("Variable '{cmat_vars_upper}' is not present in the data.")
+  )
+  # Check if the variable is numeric
+  assertthat::assert_that(
+    is.numeric(df[[cmat_vars]]),
+    msg = glue::glue("{cmat_vars_upper} must be numeric.")
+  )
+
+  category <- .classify_c(df, thresholds = c(250, 2500, 10000), var_th = cmat_vars)
+
+  return(category)
+
+}
+
+#### Documentar !!!!!
+.evaluate_c2aii <- function(df) {
+
+  # Define the variable to check
+  c2aii_vars_upper <- "C2_aii"
+  c2aii_vars <- "c2_aii"
+
+  lower_names <- tolower(names(df))
+  names(df) <- lower_names
+
+  # Check if the required variable is present
+  assertthat::assert_that(
+    c2aii_vars %in% lower_names,
+    msg = glue::glue("Variable '{c2aii_vars_upper}' is not present in the data.")
+  )
+  # Check if the variable is numeric
+  assertthat::assert_that(
+    is.numeric(df[[c2aii_vars]]),
+    msg = glue::glue("{c2aii_vars_upper} must be numeric.")
+  )
+
+  v <- df[[c2aii_vars]]
+
+  dplyr::case_when(
+    v == 100 ~ "VU",
+    v >= 95 & v < 100 ~ "EN",
+    v >= 90 & v < 95 ~ "CR",
+    TRUE ~ NA_character_
+  )
+
+
+}
+
+
+

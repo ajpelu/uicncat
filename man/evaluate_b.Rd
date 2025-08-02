@@ -2,7 +2,7 @@
 % Please edit documentation in R/evaluate_b.R
 \name{evaluate_b}
 \alias{evaluate_b}
-\title{Evaluate IUCN Criterion B (Geographic Range and Subcriteria)}
+\title{Evaluate IUCN Criterion B: Geographic Range and Subcriteria}
 \usage{
 evaluate_b(df)
 }

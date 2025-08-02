@@ -1,4 +1,4 @@
-#' Evaluate IUCN Criterion B (Geographic Range and Subcriteria)
+#' Evaluate IUCN Criterion B: Geographic Range and Subcriteria
 #'
 #' This function evaluates species against IUCN Red List Criterion **B**, which includes geographic range
 #' measures and subcriteria related to fragmentation, decline, and extreme fluctuations.

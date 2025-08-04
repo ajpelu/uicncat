@@ -50,10 +50,7 @@ evaluate_b <- function(df) {
   b_vars <- c("B1_eoo", "B2_aoo")
   missing_vars <- setdiff(b_vars, names(df))
 
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
+  .check_vars_present(df, b_vars)
 
   non_numeric <- b_vars[!sapply(df[b_vars], is.numeric)]
   if (length(non_numeric) > 0) {

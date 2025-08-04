@@ -1,3 +1,21 @@
+#' auxiliar function to check if variables are present in a data frame
+.check_vars_present <- function(df, vars) {
+  vars_lower <- tolower(vars)
+  df_names_lower <- tolower(names(df))
+
+  missing <- setdiff(vars_lower, df_names_lower)
+
+  assertthat::assert_that(
+    length(missing) == 0,
+    msg = paste0("Missing required variables: ",
+                 paste(vars[vars_lower %in% missing], collapse = ", "))
+  )
+
+  invisible(TRUE)  # invisible if all variables are present
+}
+
+
+
 #' Classify species using type-based thresholds (Criterion A)
 #'
 #' Internal function to classify species under Criterion A based on a type indicator
@@ -112,15 +130,19 @@
   # Define the variable to check
   ba_vars_upper <- "B_AND_a"
   ba_vars <- "b_and_a"
-
+  #
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
   # Check if the required variable is present
-  assertthat::assert_that(
-    ba_vars %in% lower_names,
-    msg = glue::glue("Variable '{ba_vars_upper}' is not present in the data.")
-  )
+  # assertthat::assert_that(
+  #   ba_vars %in% lower_names,
+  #   msg = glue::glue("Variable '{ba_vars_upper}' is not present in the data.")
+  # )
+
+  .check_vars_present(df, ba_vars_upper)
+
+
   # Check if the variable is numeric
   assertthat::assert_that(
     is.numeric(df[[ba_vars]]),

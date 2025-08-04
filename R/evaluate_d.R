@@ -36,13 +36,7 @@ evaluate_d <- function(df) {
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-
-  missing_vars <- setdiff(d_vars, lower_names)
-
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
+  .check_vars_present(df, d_vars)
 
   non_numeric <- d_vars[!sapply(df[d_vars], is.numeric)]
   if (length(non_numeric) > 0) {

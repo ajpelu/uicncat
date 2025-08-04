@@ -26,13 +26,7 @@ evaluate_e <- function(df) {
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-
-  missing_vars <- setdiff(e_vars, lower_names)
-
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
+  .check_vars_present(df, e_vars)
 
   tibble::tibble(
     E = dplyr::case_when(

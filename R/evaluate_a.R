@@ -42,24 +42,12 @@ evaluate_a <- function(df) {
     "A_pop_red", "type_A1", "type_A2", "type_A3", "type_A4",
     "based_a", "based_b", "based_c", "based_d", "based_e", "species"
   )
-
   a_vars <- tolower(a_vars_upper)
 
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-
-  missing_vars <- setdiff(a_vars, lower_names)
-
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
-
-  cli::cli_alert_success("All required variables are present.")
-
-
-  cli::cli_alert_info("Checking data types and value ranges...")
+  .check_vars_present(df, a_vars)
 
   assertthat::assert_that(
     is.numeric(df$a_pop_red),
@@ -70,12 +58,6 @@ evaluate_a <- function(df) {
     all(df$a_pop_red >= 0 & df$a_pop_red <= 100, na.rm = TRUE),
     msg = "'a_pop_red' must be between 0 and 100."
   )
-
-  cli::cli_alert_success("Data types and value ranges are valid.")
-
-
-
-  cli::cli_alert_info("Classifying 'a_pop_red' for types A1–A4...")
 
   types <- c("type_a1", "type_a2", "type_a3", "type_a4")
   thresholds_list <- list(
@@ -92,15 +74,11 @@ evaluate_a <- function(df) {
                                        var_th = "a_pop_red")
   }
 
-  cli::cli_alert_info("Assigning based_a to based_e categories...")
-
   for (i in letters[1:5]) {
     col_from <- paste0("based_", i)
     col_to   <- paste0("A", i)
     df[[col_to]] <- ifelse(df[[col_from]] == 1, i, NA_character_)
   }
-
-  cli::cli_alert_success("Classification complete.")
 
   return(df[c("A1", "A2", "A3", "A4",
               "Aa", "Ab", "Ac", "Ad", "Ae")])

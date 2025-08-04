@@ -36,8 +36,6 @@
 
 evaluate_a <- function(df) {
 
-  cli::cli_alert_info("Checking presence of required variables...")
-
   a_vars_upper <- c(
     "A_pop_red", "type_A1", "type_A2", "type_A3", "type_A4",
     "based_a", "based_b", "based_c", "based_d", "based_e", "species"
@@ -48,11 +46,7 @@ evaluate_a <- function(df) {
   names(df) <- lower_names
 
   .check_vars_present(df, a_vars)
-
-  assertthat::assert_that(
-    is.numeric(df$a_pop_red),
-    msg = "'a_pop_red' must be numeric."
-  )
+  .check_vars_numeric(df, a_vars_upper[[1]])
 
   assertthat::assert_that(
     all(df$a_pop_red >= 0 & df$a_pop_red <= 100, na.rm = TRUE),

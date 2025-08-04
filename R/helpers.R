@@ -175,12 +175,14 @@
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-  missing_vars <- setdiff(bb_vars, lower_names)
+  # missing_vars <- setdiff(bb_vars, lower_names)
 
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
+  # assertthat::assert_that(
+  #   length(missing_vars) == 0,
+  #   msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
+  # )
+
+  .check_vars_present(df, bb_vars_upper)
 
   # Initialize output (to store results for each row)
   output <- character(nrow(df))
@@ -223,13 +225,7 @@
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-  missing_vars <- setdiff(bc_vars, lower_names)
-
-  assertthat::assert_that(
-    length(missing_vars) == 0,
-    msg = paste("Missing required variables:", paste(missing_vars, collapse = ", "))
-  )
-
+  .check_vars_present(df, bc_vars_upper)
 
   # Initialize output (to store results for each row)
   output <- character(nrow(df))
@@ -266,11 +262,8 @@
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-  # Check if the required variable is present
-  assertthat::assert_that(
-    cmat_vars %in% lower_names,
-    msg = glue::glue("Variable '{cmat_vars_upper}' is not present in the data.")
-  )
+  .check_vars_present(df, cmat_vars_upper)
+
   # Check if the variable is numeric
   assertthat::assert_that(
     is.numeric(df[[cmat_vars]]),
@@ -293,11 +286,8 @@
   lower_names <- tolower(names(df))
   names(df) <- lower_names
 
-  # Check if the required variable is present
-  assertthat::assert_that(
-    c2aii_vars %in% lower_names,
-    msg = glue::glue("Variable '{c2aii_vars_upper}' is not present in the data.")
-  )
+  .check_vars_present(df, c2aii_vars_upper)
+
   # Check if the variable is numeric
   assertthat::assert_that(
     is.numeric(df[[c2aii_vars]]),
